@@ -4,30 +4,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreDisplay = document.getElementById('score');
     let score = 0;
     let blockSpeed = 3;
-    let touchX = null;
+    let isTouching = false;
 
     // Paddle Movement for touch devices
     gameContainer.addEventListener('touchstart', (event) => {
-        touchX = event.touches[0].clientX;
+        isTouching = true;
+        movePaddle(event.touches[0].clientX);
     });
 
     gameContainer.addEventListener('touchmove', (event) => {
-        if (touchX !== null) {
-            const newTouchX = event.touches[0].clientX;
-            const deltaX = newTouchX - touchX;
-            touchX = newTouchX;
-
-            const paddleRect = paddle.getBoundingClientRect();
-            const newPaddleLeft = paddleRect.left + deltaX;
-            if (newPaddleLeft >= 0 && newPaddleLeft <= gameContainer.clientWidth - paddleRect.width) {
-                paddle.style.left = `${newPaddleLeft}px`;
-            }
+        if (isTouching) {
+            movePaddle(event.touches[0].clientX);
         }
     });
 
     gameContainer.addEventListener('touchend', () => {
-        touchX = null;
+        isTouching = false;
     });
+
+    function movePaddle(touchX) {
+        const paddleRect = paddle.getBoundingClientRect();
+        const containerRect = gameContainer.getBoundingClientRect();
+        const newLeft = touchX - containerRect.left - paddleRect.width / 2;
+
+        if (newLeft >= 0 && newLeft <= gameContainer.clientWidth - paddleRect.width) {
+            paddle.style.left = `${newLeft}px`;
+        }
+    }
 
     // Falling Blocks
     setInterval(() => {
